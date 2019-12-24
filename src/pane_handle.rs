@@ -3,7 +3,7 @@
 //! Almost the entire library interface is defined in this module.
 
 use crate::*;
-use stdweb::web::HtmlElement;
+use stdweb::web::{HtmlElement, Node};
 use stdweb::unstable::TryInto;
 
 /// External representation of a Pane.
@@ -39,22 +39,36 @@ impl PaneHandle {
         let _pane = get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?.delete_pane(self);
         Ok(())
     }
-    /// Get a reference to a DOM node associated with the pane.
+    /// Get a reference to the DOM element associated with the pane.
+    /// The provided HTML when creating a new pane will be the child node(s) of the returned element.
     /// 
     /// The returned [`HtmlElement`] is from the crate [`stdweb`], allowing library users to
     /// escape the Panes crate and access the DOM directly.
-    /// 
-    /// The provided HTML when creating a new pane will be the child node(s) of the returned element.
     /// 
     /// TODO: Example
     /// 
     /// [`HtmlElement`]: https://docs.rs/stdweb/*/stdweb/web/struct.HtmlElement.html
     /// [`stdweb`]: https://docs.rs/stdweb/*/stdweb/
-    pub fn get_node(&self) -> Result<HtmlElement, PanesError> {
+    pub fn get_parent_element(&self) -> Result<HtmlElement, PanesError> {
         get()?.as_ref()
             .ok_or(PanesError::NotInitialized)?
             .get_node(&self)?.clone()
             .try_into()
             .map_err(|e|PanesError::BrowserError(Box::new(e)))
+    }
+    /// Get a reference to the DOM node created by the provided HTML when creating the pane.
+    /// If multiple nodes have been created, the first node is returned.
+    /// 
+    /// The returned [`Node`] is from the crate [`stdweb`], allowing library users to
+    /// escape the Panes crate and access the DOM directly.
+    /// 
+    /// TODO: Example
+    /// 
+    /// [`Node`]: https://docs.rs/stdweb/*/stdweb/web/struct.Node.html
+    /// [`stdweb`]: https://docs.rs/stdweb/*/stdweb/
+    pub fn get_first_inner_node(&self) -> Result<Node, PanesError> {
+        self.get_parent_element()?
+            .first_child()
+            .ok_or(PanesError::MissingChild)
     }
 }

@@ -11,3 +11,6 @@ readme = "README.md"
 [dependencies]
 lazy_static = "1.4"
 stdweb = "0.4"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

@@ -7,6 +7,9 @@ It works with absolute positions and can therefore be used to place HTML text el
 
 TODO
 
+### Running the examples
+To run the examples included in the library, it's recommended to install [cargo-web](https://github.com/koute/cargo-web) and then simply call `cargo web start --example hello-world`. See the [examples](./examples) folder for all available examples. 
+
 ## Implementation policy for Panes
 * Compatibility with stable Rust
 * Light-weight (only major dependency is [stdweb](https://github.com/koute/stdweb))
