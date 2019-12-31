@@ -16,6 +16,7 @@ pub enum PanesError {
     MissingRoot(String),
     MissingChild,
     BrowserError(Box<dyn Error>),
+    UndefinedSize,
 }
 
 impl fmt::Display for PanesError {
@@ -39,6 +40,8 @@ impl fmt::Display for PanesError {
                 write!(f, "HTML root element with id = {} not found.", id),
             PanesError::MissingChild =>
                 write!(f, "DOM child is missing which has been inserted before."),
+            PanesError::UndefinedSize =>
+                write!(f, "Pane has no size."),
             PanesError::BrowserError(e) =>
                 write!(f, "A browser-call returned an error: {}", e),
         }

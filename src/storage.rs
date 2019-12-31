@@ -8,6 +8,8 @@ pub (crate) trait PaneStorage {
     fn remove(&mut self, p: PaneHandle) -> Result<Pane, PanesError>;
     fn get(&self, p: &PaneHandle) -> Result<&Pane, PanesError>;
     fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, PanesError>;
+    fn for_each<F>(&mut self, f: &F) -> Result<(), PanesError> 
+        where F: Fn(&mut Pane)-> Result<(), PanesError>;
 }
 
 /// At the moment, uses a std HashMap internally.
@@ -40,6 +42,15 @@ impl PaneStorage for PaneHashMap {
             || index_error(p, idx)
         )
     }
+    fn for_each<F>(&mut self, f: &F) -> Result<(), PanesError> 
+    where F: Fn(&mut Pane)-> Result<(), PanesError>
+    {
+        for pane in self.data.values_mut() {
+            f(pane)?;
+        }
+        Ok(())
+    }
+
 }
 
 impl PaneHashMap {

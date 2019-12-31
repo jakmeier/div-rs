@@ -49,7 +49,7 @@ impl PaneHandle {
     /// 
     /// [`HtmlElement`]: https://docs.rs/stdweb/*/stdweb/web/struct.HtmlElement.html
     /// [`stdweb`]: https://docs.rs/stdweb/*/stdweb/
-    pub fn get_parent_element(&self) -> Result<HtmlElement, PanesError> {
+    pub fn parent_element(&self) -> Result<HtmlElement, PanesError> {
         get()?.as_ref()
             .ok_or(PanesError::NotInitialized)?
             .get_node(&self)?.clone()
@@ -66,8 +66,8 @@ impl PaneHandle {
     /// 
     /// [`Node`]: https://docs.rs/stdweb/*/stdweb/web/struct.Node.html
     /// [`stdweb`]: https://docs.rs/stdweb/*/stdweb/
-    pub fn get_first_inner_node(&self) -> Result<Node, PanesError> {
-        self.get_parent_element()?
+    pub fn first_inner_node(&self) -> Result<Node, PanesError> {
+        self.parent_element()?
             .first_child()
             .ok_or(PanesError::MissingChild)
     }

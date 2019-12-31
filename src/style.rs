@@ -4,7 +4,7 @@ use crate::error::*;
 pub fn add_panes_styles_to_document() -> Result<(), PanesError> {
 
     let css = r#"
-    .on-canvas {
+    .pane {
         position: absolute;
         display: unset;
         z-index: 1;
