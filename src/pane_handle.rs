@@ -12,14 +12,6 @@ use stdweb::unstable::TryInto;
 #[derive(Debug,Clone,PartialEq,Eq)]
 pub struct PaneHandle(pub (crate) usize);
 
-/// Creates a new pane at the defined position with the given HTML as content.
-/// Use the returned PaneHandle to manipulate the pane.
-pub fn new_pane(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle, PanesError> {
-    let mut state = get_mut()?;
-    let ph = state.as_mut().ok_or(PanesError::NotInitialized)?.new_pane(x,y,w,h,html)?;
-    Ok(ph)
-}
-
 impl PaneHandle {
     /// Hides the pane and all child nodes.
     /// 

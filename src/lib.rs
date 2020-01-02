@@ -5,6 +5,7 @@ use stdweb::traits::*;
 
 pub mod error;
 pub mod pane_handle;
+pub mod global;
 mod pane;
 mod state;
 mod storage;
@@ -12,6 +13,7 @@ mod style;
 
 pub use error::*;
 pub use pane_handle::*;
+pub use global::*;
 use storage::{PaneStorage, PaneHashMap};
 use state::*;
 use style::*;
@@ -47,28 +49,6 @@ pub fn init_ex(id: Option<&str>, pos: (u32,u32), size: Option<(u32, u32)>) -> Re
     add_panes_styles_to_document()
 }
 
-/// Redefines the global origin for all panes 
-/// 
-/// The position of all existing panes is changed immediately, regardless of active / inactive status.
-/// if panes::init() has been used instead of panes::init_ex(...), the default origin is (0,0).
-pub fn reposition(x: u32, y: u32) -> Result<(), PanesError> {
-    let mut state = get_mut()?;
-    let state = state.as_mut().ok_or(PanesError::NotInitialized)?;
-    state.reposition_panes(x,y)
-}
-
-/// Redefines the size of the global frame where all panes are within.
-/// The panes will change the size AND position proportionally. 
-/// 
-/// All pane sizes are resized immediately, regardless of active / inactive status.
-/// Only has an effect if the size has been defined earlier.
-pub fn resize(w: u32, h: u32) -> Result<(), PanesError> {
-    let mut state = get_mut()?;
-    let state = state.as_mut().ok_or(PanesError::NotInitialized)?;
-    state.resize_panes(w,h)
-}
-
-
 fn get_root(id: Option<&str>) -> Result<Element, PanesError> {
     let document = stdweb::web::document();
     let element = 
@@ -78,4 +58,12 @@ fn get_root(id: Option<&str>) -> Result<Element, PanesError> {
         document.body().ok_or(PanesError::MissingBody)?.into()
     };
     Ok(element)
+}
+
+/// Creates a new pane at the defined position with the given HTML as content.
+/// Use the returned PaneHandle to manipulate the pane.
+pub fn new_pane(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle, PanesError> {
+    let mut state = get_mut()?;
+    let ph = state.as_mut().ok_or(PanesError::NotInitialized)?.new_pane(x,y,w,h,html)?;
+    Ok(ph)
 }
