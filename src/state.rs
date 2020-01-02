@@ -5,9 +5,9 @@ pub (crate) struct GlobalState<PS>
 where PS: PaneStorage
 {
     pub (crate) root: Element,
-    pub (crate) x: u32,
-    pub (crate) y: u32,
+    pub (crate) pos: (u32, u32),
     pub (crate) size: Option<(u32, u32)>,
+    pub (crate) zoom: (f32, f32),
     pub (crate) nodes: PS,
 }
 

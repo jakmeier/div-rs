@@ -30,7 +30,7 @@ pub fn init() -> Result<(), PanesError> {
 /// let height = 720
 /// panes::init_ex("panes-root", 0, 0, width, height);
 /// ```
-pub fn init_ex(id: Option<&str>, (x,y): (u32,u32), size: Option<(u32, u32)>) -> Result<(), PanesError>  {
+pub fn init_ex(id: Option<&str>, pos: (u32,u32), size: Option<(u32, u32)>) -> Result<(), PanesError>  {
     let mut state = get_mut()?;
     if state.is_some() {
         return Err(PanesError::AlreadyInitialized);
@@ -40,8 +40,9 @@ pub fn init_ex(id: Option<&str>, (x,y): (u32,u32), size: Option<(u32, u32)>) -> 
     *state = Some(GlobalState {
         root,
         nodes: PaneHashMap::default(),
-        x, y,
+        pos,
         size,
+        zoom: (1.0, 1.0),
     });
     add_panes_styles_to_document()
 }

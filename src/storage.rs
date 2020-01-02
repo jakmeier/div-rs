@@ -5,7 +5,7 @@ use crate::pane::Pane;
 /// A trait for data structures which store a panes and assign unique PaneHandle to them
 pub (crate) trait PaneStorage {
     fn insert(&mut self, p: Pane) -> PaneHandle;
-    fn remove(&mut self, p: PaneHandle) -> Result<Pane, PanesError>;
+    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, PanesError>;
     fn get(&self, p: &PaneHandle) -> Result<&Pane, PanesError>;
     fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, PanesError>;
     fn for_each<F>(&mut self, f: &F) -> Result<(), PanesError> 
@@ -25,7 +25,7 @@ impl PaneStorage for PaneHashMap {
         self.data.insert(i,p);
         PaneHandle(i)
     }
-    fn remove(&mut self, p: PaneHandle) -> Result<Pane, PanesError> {
+    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, PanesError> {
         self.data.remove(&p.0).ok_or_else(
             || index_error(&p, self.next_idx)
         )

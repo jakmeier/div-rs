@@ -26,17 +26,47 @@ impl PaneHandle {
     /// The pane root node is removed from the DOM but it is kept in memory.
     /// Call `delete` to give up memory or call `show` later to display pane again.
     pub fn hide(&self) -> Result<(), PanesError> {
-        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?.hide_pane(&self)?;
+        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?
+            .hide_pane(&self)?;
         Ok(())
     }
     /// Displays pane again after it has been hidden by calling `hide`
     pub fn show(&self) -> Result<(), PanesError> {
-        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?.show_pane(&self)?;
+        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?
+            .show_pane(&self)?;
+        Ok(())
+    }
+    /// Adjust the relative position of the pane.
+    /// 
+    /// The provided parameters are taken in the original scale when initializing,
+    /// taking any calls to the global panes::resize() into consideration.
+    pub fn reposition(&self, x: u32, y: u32) -> Result<(), PanesError> {
+        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?
+            .update_pane(&self,Some(x),Some(y),None,None)?;
+        Ok(())
+    }
+    /// Adjust the size of the pane.
+    /// 
+    /// The provided parameters are taken in the original scale when initializing,
+    /// taking any calls to the global panes::resize() into consideration.
+    pub fn resize(&self, w: u32, h: u32) -> Result<(), PanesError> {
+        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?
+            .update_pane(&self,None,None,Some(w),Some(h))?;
+        Ok(())
+    }
+    /// Adjust the position and size of the pane in a single call, which is slightly more efficient than calling
+    /// resize and reposition separately.
+    /// 
+    /// The provided parameters are taken in the original scale when initializing,
+    /// taking any calls to the global panes::resize() into consideration.
+    pub fn reposition_and_resize(&self, x: u32, y: u32, w: u32, h: u32) -> Result<(), PanesError> {
+        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?
+            .update_pane(&self, Some(x), Some(y), Some(w), Some(h))?;
         Ok(())
     }
     /// Removes a pane from the DOM and deletes it
-    pub fn delete(self) -> Result<(), PanesError> {
-        let _pane = get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?.delete_pane(self);
+    pub fn delete(&mut self) -> Result<(), PanesError> {
+        get_mut()?.as_mut().ok_or(PanesError::NotInitialized)?.delete_pane(self)?;
         Ok(())
     }
     /// Get a reference to the DOM element associated with the pane.
