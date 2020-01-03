@@ -19,10 +19,14 @@ pub (crate) struct Pane {
 impl<PS: PaneStorage> GlobalState<PS> {
 
     /// Creates a new pane from specified html and shows it
-    pub (crate) fn new_pane(&mut self, x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle, PanesError> {
+    pub (crate) fn new_pane(&mut self, x: u32, y: u32, w: u32, h: u32, html: &str, classes: &str, css: &str) 
+    -> Result<PaneHandle, PanesError>
+    {
         let x = self.pos.0 + x;
         let y = self.pos.1 + y;
-        let wrapped_html = format!(r#"<div class="pane" style="left: {}px; top: {}px; width: {}px; height: {}px">{}</div>"#, x, y, w, h, html);
+        let wrapped_html = format!(
+            r#"<div class="pane {}" style="left: {}px; top: {}px; width: {}px; height: {}px; {}">{}</div>"#
+            , classes, x, y, w, h, css, html);
         self.root.append_html(&wrapped_html)
             .map_err(|e|PanesError::BrowserError(Box::new(e)))?;
         let node = self.root.last_child().ok_or(PanesError::MissingChild)?;

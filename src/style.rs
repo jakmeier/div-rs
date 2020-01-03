@@ -1,7 +1,7 @@
 use stdweb::web::*;
 use crate::error::*;
 
-pub fn add_panes_styles_to_document() -> Result<(), PanesError> {
+pub (crate) fn add_panes_styles_to_document() -> Result<(), PanesError> {
 
     let css = r#"
     .pane {
