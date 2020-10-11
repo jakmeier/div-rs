@@ -6,22 +6,24 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlElement, HtmlScriptElement};
 
-#[wasm_bindgen(module = "/src/class_loader.js")]
+#[wasm_bindgen(module = "/src/class/class_loader.js")]
 extern "C" {
-    pub(super) fn instantiate_class(a: &str, node: &HtmlElement);
+    pub(super) fn instantiate_svelte_component(a: &str, node: &HtmlElement);
     fn loading_progress() -> i32;
+    pub(super) fn svelte_component_exists(name: &str) -> bool; 
+    pub fn init_div_rs();
 }
 
 static LOADED: AtomicI32 = AtomicI32::new(0);
 
 pub(super) fn build_class_loading_module(classes: &[&str], src: &str) -> String {
     let mut code = format!(
-        "import {{{}}} from '{}';\nwindow.panes = window.panes || {{}};",
+        "import {{{}}} from '{}';\nwindow.__div_rs = window.__div_rs || {{svcom: {{}}, loaded: 0}};",
         classes.join(", "),
         src
     );
     for class_name in classes {
-        code += "\nwindow.panes.";
+        code += "\nwindow.__div_rs.svcom.";
         code += class_name;
         code += " = classes.";
         code += class_name;
@@ -30,6 +32,7 @@ pub(super) fn build_class_loading_module(classes: &[&str], src: &str) -> String 
     code
 }
 
+/// **Experimental: This API is experimental and my not be included in later versions**
 /// Asynchronously loads a JS module by appending a script tag to the head with th e provided string as content.
 /// Poll the future until it resolves to know when the script has been loaded for sure.
 /// In contrast to the more conventional Future design, the JS module will be loaded even if the Future is not polled.
@@ -42,8 +45,8 @@ pub fn load_js_module(mut code: String) -> Result<PendingScript, PanesError> {
         .dyn_into()
         .map_err(|_| PanesError::JsCastError)?;
     script.set_attribute("type", "module")?;
-    code += "\nwindow.panes = window.panes || {};";
-    code += "\nwindow.panes.____loaded = (window.panes.____loaded || 0) + 1;";
+    code += "\nwindow.__div_rs = window.__div_rs || {};";
+    code += "\nwindow.__div_rs.loaded = (window.panes.loaded || 0) + 1;";
     script.set_text(&code)?;
 
     let head = doc.head().ok_or(PanesError::MissingHead)?;

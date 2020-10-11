@@ -46,10 +46,31 @@ impl JsClassStorage {
             out
         })
     }
+    pub(crate) fn preloaded(&mut self, name: &str) -> Option<JsClassHandle> {
+        if let Some(class) = self.find_by_name(name) {
+            return Some(class);
+        }
+        if svelte_component_exists(name) {
+            let index = self.data.len();
+            let class = JsClass {
+                name: name.to_string(),
+            };
+            self.data.push(class);
+            let class_handle = JsClassHandle { index };
+            return Some(class_handle);
+        }
+        None
+    }
+    fn find_by_name(&self, name: &str) -> Option<JsClassHandle> {
+        self.data
+            .iter()
+            .position(|ch| ch.name == name)
+            .map(|index| JsClassHandle { index })
+    }
 }
 
 impl JsClass {
-    pub fn attach_new_instance(&self, node: &HtmlElement) {
-        instantiate_class(&self.name, node);
+    pub(crate) fn attach_new_instance(&self, node: &HtmlElement) {
+        instantiate_svelte_component(&self.name, node);
     }
 }

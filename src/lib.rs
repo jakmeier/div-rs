@@ -48,7 +48,9 @@ pub fn init_ex(
         zoom: (1.0, 1.0),
         classes: JsClassStorage::default(),
     })?;
-    add_panes_styles_to_document()
+    add_panes_styles_to_document()?;
+    init_div_rs();
+    Ok(())
 }
 
 fn get_root(id: Option<&str>) -> Result<Element, PanesError> {
@@ -122,9 +124,11 @@ where
     state::exec_mut(|state| state.new_pane(x, y, w, h, html, &classes_str, &css_str))
 }
 
+/// **Experimental: This API is experimental and my not be included in later versions**
 /// Load a class named `name` from a JS file accessible at `src`.
 ///
-/// Returns a Vanilla Future that will have to be handled in one way or another.
+/// Returns a Future because the script is loaded asynchronously.
+/// That future will have to be handled in one way or another.
 /// The most direct way would be to use `wasm_bindgen_futures::spawn_local`
 /// ## Example
 /// ```rust
@@ -146,6 +150,7 @@ pub fn load_js_class(
     Ok(async { classes.await[0] })
 }
 
+/// **Experimental: This API is experimental and my not be included in later versions**
 /// Attempts to load a JS module by its source path and loads the classes exported by it, as named by the classes parameter.
 /// Usage is equivalent to `load_js_class`.
 pub fn load_js_classes(
@@ -169,4 +174,12 @@ pub fn from_js_class(
     let class = state::get_class(class_handle)?;
     class.attach_new_instance(&node);
     Ok(ph)
+}
+
+impl JsClass {
+    /// Load a JS class that has already been registered, usually by JS code.
+    /// Return None if no such class has been registered.
+    pub fn preregistered(name: &str) -> Option<JsClassHandle> {
+        state::exec_mut(|state| Ok(state.classes.preloaded(name))).unwrap()
+    }
 }
