@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    panes::init().unwrap();
+    div::init().unwrap();
     set_panic_hook();
 
     // Create a new pane at offset (100,100) from body
@@ -12,14 +12,14 @@ pub fn main() {
     const Y: u32 = 100;
     const W: u32 = 500;
     const H: u32 = 500;
-    let class = panes::JsClass::preregistered("MyComponent")
+    let class = div::JsClass::preregistered("MyComponent")
         .expect("JS class Test has not been registered properly");
-    panes::from_js_class(X, Y, W, H, class).unwrap();
+    div::from_js_class(X, Y, W, H, class).unwrap();
 
     /* Alternative that loads classes from a separate JS file instead of registering in the JS code. */
     // let future = async {
-    //     let class = panes::load_js_class("MyComponent", "./some_file.js").unwrap().await;
-    //     panes::from_js_class(X, Y, W, H, class).unwrap();
+    //     let class = div::load_js_class("MyComponent", "./some_file.js").unwrap().await;
+    //     div::from_js_class(X, Y, W, H, class).unwrap();
     // };
     // wasm_bindgen_futures::spawn_local(future);
 }

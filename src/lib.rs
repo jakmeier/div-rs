@@ -20,25 +20,25 @@ use storage::{ClassStorage, PaneHashMap, PaneStorage};
 use style::*;
 use utils::doc;
 
-/// Mounts the panes to the HTML body
-pub fn init() -> Result<(), PanesError> {
+/// Mounts the div to the HTML body
+pub fn init() -> Result<(), DivError> {
     init_ex(None, (0, 0), None)
 }
 
 /// Extended initialization function.
-/// Mounts the panes as a child of the HTML element with the defined ID.
-/// The specified dimensions restrict the area in which panes are visible.
+/// Mounts the div as a child of the HTML element with the defined ID.
+/// The specified dimensions restrict the area in which div are visible.
 /// # Example
 /// ```
 /// let width = 1280
 /// let height = 720
-/// panes::init_ex("panes-root", 0, 0, width, height);
+/// div::init_ex("div-root", 0, 0, width, height);
 /// ```
 pub fn init_ex(
     id: Option<&str>,
     pos: (u32, u32),
     size: Option<(u32, u32)>,
-) -> Result<(), PanesError> {
+) -> Result<(), DivError> {
     let root = get_root(id)?;
     state::set_state(GlobalState {
         root,
@@ -48,25 +48,25 @@ pub fn init_ex(
         zoom: (1.0, 1.0),
         classes: JsClassStorage::default(),
     })?;
-    add_panes_styles_to_document()?;
+    add_div_styles_to_document()?;
     init_div_rs();
     Ok(())
 }
 
-fn get_root(id: Option<&str>) -> Result<Element, PanesError> {
+fn get_root(id: Option<&str>) -> Result<Element, DivError> {
     let element = if id.is_some() {
         doc()?
             .get_element_by_id(id.unwrap())
-            .ok_or(PanesError::MissingRoot(id.unwrap().to_owned()))?
+            .ok_or(DivError::MissingRoot(id.unwrap().to_owned()))?
     } else {
-        doc()?.body().ok_or(PanesError::MissingBody)?.into()
+        doc()?.body().ok_or(DivError::MissingBody)?.into()
     };
     Ok(element)
 }
 
 /// Creates a new pane at the defined position with the given HTML as content.
 /// Use the returned PaneHandle to manipulate the pane.
-pub fn new_pane(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle, PanesError> {
+pub fn new_pane(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle, DivError> {
     let css = "";
     let classes = "";
     state::exec_mut(|state| state.new_pane(x, y, w, h, html, css, classes))
@@ -86,7 +86,7 @@ pub fn new_pane(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle
 /// let html = "Some text";
 /// let classes = ["my-class"];
 /// let css: [(&str, &str);0] = [];
-/// let pane = panes::new_styled_pane(
+/// let pane = div::new_styled_pane(
 ///     0,0,1000,1000,
 ///     html,
 ///     &classes,
@@ -101,7 +101,7 @@ pub fn new_styled_pane<'a, C, CSS, S1, S2, S3>(
     html: &str,
     classes: C,
     css: CSS,
-) -> Result<PaneHandle, PanesError>
+) -> Result<PaneHandle, DivError>
 where
     C: IntoIterator<Item = &'a S1>,
     CSS: IntoIterator<Item = &'a (S2, S3)>,
@@ -137,15 +137,15 @@ where
 /// const W: u32 = 500;
 /// const H: u32 = 500;
 /// let future = async {
-///     let class = panes::load_js_class("Test", "./Test.js").unwrap().await;
-///     panes::from_js_class(X, Y, W, H, class).unwrap();
+///     let class = div::load_js_class("Test", "./Test.js").unwrap().await;
+///     div::from_js_class(X, Y, W, H, class).unwrap();
 /// };
 /// wasm_bindgen_futures::spawn_local(future);
 /// ```
 pub fn load_js_class(
     name: &str,
     src: &str,
-) -> Result<impl Future<Output = JsClassHandle>, PanesError> {
+) -> Result<impl Future<Output = JsClassHandle>, DivError> {
     let classes = load_js_classes(&[name], src)?;
     Ok(async { classes.await[0] })
 }
@@ -156,7 +156,7 @@ pub fn load_js_class(
 pub fn load_js_classes(
     classes: &[&str],
     src: &str,
-) -> Result<impl Future<Output = Vec<JsClassHandle>>, PanesError> {
+) -> Result<impl Future<Output = Vec<JsClassHandle>>, DivError> {
     let future = state::exec_mut(|state| state.classes.load(classes, src))?;
     Ok(future)
 }
@@ -168,7 +168,7 @@ pub fn from_js_class(
     w: u32,
     h: u32,
     class_handle: JsClassHandle,
-) -> Result<PaneHandle, PanesError> {
+) -> Result<PaneHandle, DivError> {
     let ph = new_pane(x, y, w, h, "")?;
     let node = ph.parent_element()?;
     let class = state::get_class(class_handle)?;

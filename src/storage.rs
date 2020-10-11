@@ -2,15 +2,15 @@ use crate::pane::Pane;
 use crate::*;
 use std::collections::HashMap;
 
-/// A trait for data structures which store a panes and assign unique PaneHandle to them
+/// A trait for data structures which store a div and assign unique PaneHandle to them
 pub(crate) trait PaneStorage {
     fn insert(&mut self, p: Pane) -> PaneHandle;
-    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, PanesError>;
-    fn get(&self, p: &PaneHandle) -> Result<&Pane, PanesError>;
-    fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, PanesError>;
-    fn for_each<F>(&mut self, f: &F) -> Result<(), PanesError>
+    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, DivError>;
+    fn get(&self, p: &PaneHandle) -> Result<&Pane, DivError>;
+    fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, DivError>;
+    fn for_each<F>(&mut self, f: &F) -> Result<(), DivError>
     where
-        F: Fn(&mut Pane) -> Result<(), PanesError>;
+        F: Fn(&mut Pane) -> Result<(), DivError>;
 }
 /// A trait for data structures which store information about JS classes loaded in
 pub(crate) trait ClassStorage {
@@ -30,23 +30,23 @@ impl PaneStorage for PaneHashMap {
         self.data.insert(i, p);
         PaneHandle(i)
     }
-    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, PanesError> {
+    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, DivError> {
         self.data
             .remove(&p.0)
             .ok_or_else(|| index_error(&p, self.next_idx))
     }
-    fn get(&self, p: &PaneHandle) -> Result<&Pane, PanesError> {
+    fn get(&self, p: &PaneHandle) -> Result<&Pane, DivError> {
         self.data
             .get(&p.0)
             .ok_or_else(|| index_error(p, self.next_idx))
     }
-    fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, PanesError> {
+    fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, DivError> {
         let idx = self.next_idx;
         self.data.get_mut(&p.0).ok_or_else(|| index_error(p, idx))
     }
-    fn for_each<F>(&mut self, f: &F) -> Result<(), PanesError>
+    fn for_each<F>(&mut self, f: &F) -> Result<(), DivError>
     where
-        F: Fn(&mut Pane) -> Result<(), PanesError>,
+        F: Fn(&mut Pane) -> Result<(), DivError>,
     {
         for pane in self.data.values_mut() {
             f(pane)?;
@@ -63,10 +63,10 @@ impl PaneHashMap {
     }
 }
 
-fn index_error(p: &PaneHandle, max_idx: usize) -> PanesError {
+fn index_error(p: &PaneHandle, max_idx: usize) -> DivError {
     if max_idx > p.0 {
-        PanesError::UseAfterDelete
+        DivError::UseAfterDelete
     } else {
-        PanesError::NotAllocated
+        DivError::NotAllocated
     }
 }

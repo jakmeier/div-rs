@@ -1,6 +1,6 @@
 use crate::{error::*, utils::doc};
 
-pub(crate) fn add_panes_styles_to_document() -> Result<(), PanesError> {
+pub(crate) fn add_div_styles_to_document() -> Result<(), DivError> {
     let css = r#"
     .pane {
         position: absolute;
@@ -10,7 +10,7 @@ pub(crate) fn add_panes_styles_to_document() -> Result<(), PanesError> {
     }
     "#;
 
-    let head = doc()?.head().ok_or(PanesError::MissingHead)?;
+    let head = doc()?.head().ok_or(DivError::MissingHead)?;
     let style = doc()?.create_element("style")?;
     style.set_attribute("type", "text/css")?;
     style.set_text_content(Some(css));

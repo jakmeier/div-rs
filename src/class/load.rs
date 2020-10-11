@@ -1,4 +1,4 @@
-use crate::PanesError;
+use crate::DivError;
 use std::sync::atomic::{AtomicI32, Ordering};
 use std::task::Poll;
 use std::{pin::Pin, task::Context};
@@ -10,7 +10,7 @@ use web_sys::{HtmlElement, HtmlScriptElement};
 extern "C" {
     pub(super) fn instantiate_svelte_component(a: &str, node: &HtmlElement);
     fn loading_progress() -> i32;
-    pub(super) fn svelte_component_exists(name: &str) -> bool; 
+    pub(super) fn svelte_component_exists(name: &str) -> bool;
     pub fn init_div_rs();
 }
 
@@ -37,19 +37,19 @@ pub(super) fn build_class_loading_module(classes: &[&str], src: &str) -> String 
 /// Poll the future until it resolves to know when the script has been loaded for sure.
 /// In contrast to the more conventional Future design, the JS module will be loaded even if the Future is not polled.
 /// The Future only checks if it has already finished.
-pub fn load_js_module(mut code: String) -> Result<PendingScript, PanesError> {
-    let window = web_sys::window().ok_or(PanesError::MissingWindow)?;
-    let doc = window.document().ok_or(PanesError::MissingDocument)?;
+pub fn load_js_module(mut code: String) -> Result<PendingScript, DivError> {
+    let window = web_sys::window().ok_or(DivError::MissingWindow)?;
+    let doc = window.document().ok_or(DivError::MissingDocument)?;
     let script: HtmlScriptElement = doc
         .create_element("script")?
         .dyn_into()
-        .map_err(|_| PanesError::JsCastError)?;
+        .map_err(|_| DivError::JsCastError)?;
     script.set_attribute("type", "module")?;
     code += "\nwindow.__div_rs = window.__div_rs || {};";
-    code += "\nwindow.__div_rs.loaded = (window.panes.loaded || 0) + 1;";
+    code += "\nwindow.__div_rs.loaded = (window.div.loaded || 0) + 1;";
     script.set_text(&code)?;
 
-    let head = doc.head().ok_or(PanesError::MissingHead)?;
+    let head = doc.head().ok_or(DivError::MissingHead)?;
     head.append_child(&script)?;
 
     // At this point, everything is set up for the event loop to load our script in the future.

@@ -8,7 +8,7 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-panes = { path = "../../" }
+div = { path = "../../" }
 wasm-bindgen = "0.2.68"
 wasm-bindgen-futures = "0.4.18"
 

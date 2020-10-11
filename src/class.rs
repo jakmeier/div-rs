@@ -3,7 +3,7 @@ pub use load::*;
 use web_sys::HtmlElement;
 
 use crate::ClassStorage;
-use crate::PanesError;
+use crate::DivError;
 
 #[derive(Debug, Hash, Clone, Copy, Eq, PartialEq)]
 pub struct JsClassHandle {
@@ -29,7 +29,7 @@ impl JsClassStorage {
         &mut self,
         classes: &[&str],
         src: &str,
-    ) -> Result<impl std::future::Future<Output = Vec<JsClassHandle>>, PanesError> {
+    ) -> Result<impl std::future::Future<Output = Vec<JsClassHandle>>, DivError> {
         let code = build_class_loading_module(classes, src);
         let mut out = vec![];
         for class_name in classes {

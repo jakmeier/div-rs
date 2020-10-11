@@ -5,7 +5,7 @@ use std::fmt;
 /// Generic error type for all library calls which may fail.
 ///
 /// Having a common type for all errors can vastly simplify all kinds of call-chains.
-pub enum PanesError {
+pub enum DivError {
     UseAfterDelete,
     NotAllocated,
     NotInitialized,
@@ -23,56 +23,56 @@ pub enum PanesError {
     UndefinedSize,
 }
 
-impl fmt::Display for PanesError {
+impl fmt::Display for DivError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            PanesError::UseAfterDelete =>
+            DivError::UseAfterDelete =>
                 write!(f, "This pane has already been deleted."),
-            PanesError::NotAllocated =>
+            DivError::NotAllocated =>
                 write!(f, "Invalid pane handle, pane has never been allocated."),
-            PanesError::Locked =>
-                write!(f, "The Panes-internal data structure has dead-locked itself. This is most likely a bug in Panes."),
-            PanesError::NotInitialized =>
-                write!(f, "Called panes functions before initializing it. Call panes::init() to initialize to body."),
-            PanesError::AlreadyInitialized=>
-                write!(f, "Panes has already been initialized, cannot do it again."),
-            PanesError::MissingBody =>
+            DivError::Locked =>
+                write!(f, "The Div-internal data structure has dead-locked itself. This is most likely a bug in Div."),
+            DivError::NotInitialized =>
+                write!(f, "Called div functions before initializing it. Call div::init() to initialize to body."),
+            DivError::AlreadyInitialized=>
+                write!(f, "Div has already been initialized, cannot do it again."),
+            DivError::MissingBody =>
                 write!(f, "No HTML body found."),
-            PanesError::MissingHead =>
+            DivError::MissingHead =>
                 write!(f, "No HTML head found."),
-            PanesError::MissingWindow =>
+            DivError::MissingWindow =>
                 write!(f, "No Window."),
-            PanesError::MissingDocument =>
+            DivError::MissingDocument =>
                 write!(f, "No Document."),
-            PanesError::MissingRoot(id) =>
+            DivError::MissingRoot(id) =>
                 write!(f, "HTML root element with id = {} not found.", id),
-            PanesError::MissingChild =>
+            DivError::MissingChild =>
                 write!(f, "DOM child is missing which has been inserted before."),
-            PanesError::UndefinedSize =>
+            DivError::UndefinedSize =>
                 write!(f, "Pane has no size."),
-            PanesError::BrowserError(e) =>
+            DivError::BrowserError(e) =>
                 write!(f, "A browser-call returned an error: {}", e),
-            PanesError::JsError(msg) =>
+            DivError::JsError(msg) =>
                 write!(f, "JS error: {}", msg),
-            PanesError::JsCastError =>
+            DivError::JsCastError =>
                 write!(f, "JS Cast Error"),
         }
     }
 }
 
-impl Error for PanesError {
+impl Error for DivError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            PanesError::BrowserError(err) => Some(err.as_ref()),
+            DivError::BrowserError(err) => Some(err.as_ref()),
             _ => None,
         }
     }
 }
 
-impl From<wasm_bindgen::JsValue> for PanesError {
+impl From<wasm_bindgen::JsValue> for DivError {
     fn from(err: wasm_bindgen::JsValue) -> Self {
         web_sys::console::error_1(&err);
-        PanesError::JsError(
+        DivError::JsError(
             "Something in the browser went wrong, check the console error output for more info"
                 .to_owned(),
         )

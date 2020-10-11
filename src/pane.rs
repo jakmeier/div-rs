@@ -25,9 +25,9 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         html: &str,
         classes: &str,
         css: &str,
-    ) -> Result<PaneHandle, PanesError> {
-        let window = web_sys::window().ok_or(PanesError::MissingWindow)?;
-        let doc = window.document().ok_or(PanesError::MissingDocument)?;
+    ) -> Result<PaneHandle, DivError> {
+        let window = web_sys::window().ok_or(DivError::MissingWindow)?;
+        let doc = window.document().ok_or(DivError::MissingDocument)?;
 
         let x = self.pos.0 + x;
         let y = self.pos.1 + y;
@@ -35,7 +35,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         let node: HtmlElement = doc
             .create_element("div")?
             .dyn_into()
-            .map_err(|_| PanesError::JsCastError)?;
+            .map_err(|_| DivError::JsCastError)?;
         node.set_class_name(classes);
         node.set_inner_html(html);
         node.set_attribute("style", css)?;
@@ -54,20 +54,20 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         let ph = self.nodes.insert(vnode);
         Ok(ph)
     }
-    pub(crate) fn hide_pane(&mut self, p: &PaneHandle) -> Result<(), PanesError> {
+    pub(crate) fn hide_pane(&mut self, p: &PaneHandle) -> Result<(), DivError> {
         let v = &self.nodes.get_mut(p)?;
         if v.displayed {
             let old_node = self
                 .root
                 .remove_child(&v.node)
-                .map_err(|_e| PanesError::MissingChild)?;
+                .map_err(|_e| DivError::MissingChild)?;
             let entry = self.nodes.get_mut(p).unwrap();
-            entry.node = old_node.dyn_into().map_err(|_| PanesError::JsCastError)?;
+            entry.node = old_node.dyn_into().map_err(|_| DivError::JsCastError)?;
             entry.displayed = false;
         }
         Ok(())
     }
-    pub(crate) fn show_pane(&mut self, p: &PaneHandle) -> Result<(), PanesError> {
+    pub(crate) fn show_pane(&mut self, p: &PaneHandle) -> Result<(), DivError> {
         let mut v = self.nodes.get_mut(&p)?;
         if !v.displayed {
             self.root.append_child(&v.node)?;
@@ -75,14 +75,14 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         }
         Ok(())
     }
-    pub(crate) fn delete_pane(&mut self, p: &PaneHandle) -> Result<(), PanesError> {
+    pub(crate) fn delete_pane(&mut self, p: &PaneHandle) -> Result<(), DivError> {
         // This removes the node from the DOM
         self.hide_pane(p)?;
         // This deletes all references for GC
         self.nodes.remove(p)?;
         Ok(())
     }
-    pub(crate) fn get_node(&self, p: &PaneHandle) -> Result<&HtmlElement, PanesError> {
+    pub(crate) fn get_node(&self, p: &PaneHandle) -> Result<&HtmlElement, DivError> {
         let v = self.nodes.get(&p)?;
         Ok(&v.node)
     }
@@ -94,7 +94,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         y: Option<u32>,
         w: Option<u32>,
         h: Option<u32>,
-    ) -> Result<(), PanesError> {
+    ) -> Result<(), DivError> {
         let mut v = self.nodes.get_mut(&pane_handle)?;
         v.x = x.unwrap_or(v.x);
         v.y = y.unwrap_or(v.y);
@@ -103,7 +103,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         v.redraw(self.pos, self.zoom)?;
         Ok(())
     }
-    pub(crate) fn reposition_panes(&mut self, x: u32, y: u32) -> Result<(), PanesError> {
+    pub(crate) fn reposition_div(&mut self, x: u32, y: u32) -> Result<(), DivError> {
         self.pos = (x, y);
         self.nodes.for_each(&|pane: &mut Pane| {
             let el = pane.get_element()?;
@@ -119,7 +119,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
             Ok(())
         })
     }
-    pub(crate) fn resize_panes(&mut self, w: u32, h: u32) -> Result<(), PanesError> {
+    pub(crate) fn resize_div(&mut self, w: u32, h: u32) -> Result<(), DivError> {
         if let Some((width, height)) = self.size {
             let fx = w as f32 / width as f32;
             let fy = h as f32 / height as f32;
@@ -128,20 +128,20 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
             let pos = self.pos;
             self.nodes.for_each(&|p| p.redraw(pos, zoom))
         } else {
-            Err(PanesError::UndefinedSize)
+            Err(DivError::UndefinedSize)
         }
     }
 }
 
 impl Pane {
-    pub(crate) fn get_element(&self) -> Result<&HtmlElement, PanesError> {
+    pub(crate) fn get_element(&self) -> Result<&HtmlElement, DivError> {
         Ok(&self.node)
     }
     pub(crate) fn redraw(
         &self,
         (x, y): (u32, u32),
         (fx, fy): (f32, f32),
-    ) -> Result<(), PanesError> {
+    ) -> Result<(), DivError> {
         let x = x + (fx * self.x as f32) as u32;
         let y = y + (fy * self.y as f32) as u32;
         let w = (fx * self.w as f32) as u32;
