@@ -1,35 +1,67 @@
 use crate::*;
-use lazy_static::lazy_static;
-
-pub (crate) struct GlobalState<PS> 
-where PS: PaneStorage
+pub(crate) struct GlobalState<PS, CS>
+where
+    PS: PaneStorage,
+    CS: ClassStorage,
 {
-    pub (crate) root: Element,
-    pub (crate) pos: (u32, u32),
-    pub (crate) size: Option<(u32, u32)>,
-    pub (crate) zoom: (f32, f32),
-    pub (crate) nodes: PS,
+    pub(crate) root: web_sys::Element,
+    pub(crate) pos: (u32, u32),
+    pub(crate) size: Option<(u32, u32)>,
+    pub(crate) zoom: (f32, f32),
+    pub(crate) nodes: PS,
+    pub(crate) classes: CS,
+}
+use std::thread_local;
+thread_local! {
+    static S_STATE: RwLock<Option<GlobalState<PaneHashMap, JsClassStorage>>> = RwLock::default();
 }
 
-// This library is built on the premise that it will only run in a single thread of a browser.
-// Until there is browser support for multiple threads that can access the same DOM, there 
-// should be no reason to challenge this assumption. Therefore, we could use `static mut` here 
-// and some unsafe code to access it and it would mostly be fine. However, recursive mutable access
-// to shared state can still cause problems with state being mutated when we would not expect it to
-// do so, which then becomes annoying to debug.
-// Besides, the RwLock implementation for the web target is really light-weight (basically a single 
-// boolean). Using it therefore does not add unnecessary costs but it keeps rustc happy and helpful.
-// TLDR: Using an RwLock here is more idiomatic than not using it, even on a single-threaded machine.
-lazy_static! {
-    static ref S_STATE: RwLock<Option<GlobalState<PaneHashMap>>> = RwLock::default();
+// pub (crate) fn get<'a>() -> Result<RwLockReadGuard<'a, Option<GlobalState<PaneHashMap, JsClassStorage>>>, PanesError>
+// pub(crate) fn get(
+// ) -> Result<RwLockReadGuard<'a, Option<GlobalState<PaneHashMap, JsClassStorage>>>, PanesError> {
+//     S_STATE.with(|state| state.read().map_err(|_e| PanesError::Locked))
+// }
+
+pub(crate) fn set_state(
+    new_state: GlobalState<PaneHashMap, JsClassStorage>,
+) -> Result<(), PanesError> {
+    S_STATE.with(|state| {
+        let mut state = state.write().map_err(|_e| PanesError::Locked)?;
+        if state.is_some() {
+            return Err(PanesError::AlreadyInitialized);
+        }
+        state.replace(new_state);
+        Ok(())
+    })
 }
 
-pub (crate) fn get<'a>() -> Result<RwLockReadGuard<'a, Option<GlobalState<PaneHashMap>>>, PanesError>
-{
-    S_STATE.read().map_err(|_e| PanesError::Locked)
+pub(crate) fn get_class(class_handle: JsClassHandle) -> Result<JsClass, PanesError> {
+    S_STATE.with(|state| {
+        let state = state.read().map_err(|_e| PanesError::Locked)?;
+        let class = state
+            .as_ref()
+            .ok_or(PanesError::NotInitialized)?
+            .classes
+            .get(class_handle);
+        Ok(class.clone())
+    })
 }
 
-pub (crate) fn get_mut<'a>() -> Result<RwLockWriteGuard<'a, Option<GlobalState<PaneHashMap>>>,PanesError>
+pub(crate) fn exec<T, F>(f: F) -> Result<T, PanesError>
+where
+    F: FnOnce(&GlobalState<PaneHashMap, JsClassStorage>) -> Result<T, PanesError>,
 {
-    S_STATE.write().map_err(|_e| PanesError::Locked)
+    S_STATE.with(|state| {
+        let state = state.read().map_err(|_e| PanesError::Locked)?;
+        f(state.as_ref().as_ref().ok_or(PanesError::NotInitialized)?)
+    })
+}
+pub(crate) fn exec_mut<T, F>(f: F) -> Result<T, PanesError>
+where
+    F: FnOnce(&mut GlobalState<PaneHashMap, JsClassStorage>) -> Result<T, PanesError>,
+{
+    S_STATE.with(|state| {
+        let mut state = state.write().map_err(|_e| PanesError::Locked)?;
+        f(state.as_mut().as_mut().ok_or(PanesError::NotInitialized)?)
+    })
 }
