@@ -15,7 +15,9 @@ defined in JavaScript into the element.
 
 ## Examples
 
-Have a look at the examples in example directory. The best way is to clone the repository and run it locally, so you can play around with the code.
+The examples in this crate are hosted online: [div-rs Examples](https://div.paddlers.ch/)
+
+Have a look at the code in example directory. The best way is to clone the repository and run it locally, so you can play around with the code.
 
 You need npm, webpack, and wasm-pack for the examples to run on your machine.
 ```
