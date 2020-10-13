@@ -1,0 +1,19 @@
+body {
+    margin: auto;
+    text-align: center;
+}
+
+main {
+    margin: auto;
+    width: 500px;
+    height: 500px;
+    margin: auto;
+    background-color: white;
+    box-shadow: 20px 20px rgba(0, 0, 0, .15);
+    border-style: solid;
+}
+
+#div-root {
+    padding: 10px;
+    position: relative;
+}

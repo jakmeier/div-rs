@@ -18,6 +18,12 @@ module.exports = {
             test: /\.(html|svelte)$/,
             exclude: /node_modules/,
             use: 'svelte-loader'
+        }, {
+            test: /\.css$/,
+            use: [
+                'style-loader',
+                'css-loader'
+            ]
         }]
     },
     plugins: [

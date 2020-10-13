@@ -4,6 +4,6 @@
     }
 </script>
 <div>
-    <h1>Hello Svelte Component</h1>
+    <h2>Hello Svelte Component</h2>
     <button on:click={hello}>Hi!</button>
 </div>

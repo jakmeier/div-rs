@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    div::init().unwrap();
+    div::init_to("div-root").unwrap();
     set_panic_hook();
 
     // Create a new pane at offset (100,100) from body

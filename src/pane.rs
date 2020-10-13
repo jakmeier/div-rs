@@ -36,7 +36,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
             .create_element("div")?
             .dyn_into()
             .map_err(|_| DivError::JsCastError)?;
-        node.set_class_name(classes);
+        node.set_class_name(&("pane ".to_owned() + classes));
         node.set_inner_html(html);
         node.set_attribute("style", css)?;
 

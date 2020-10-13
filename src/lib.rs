@@ -25,6 +25,11 @@ pub fn init() -> Result<(), DivError> {
     init_ex(None, (0, 0), None)
 }
 
+/// Mounts the div to a element with the given id
+pub fn init_to(id: &str) -> Result<(), DivError> {
+    init_ex(Some(id), (0, 0), None)
+}
+
 /// Extended initialization function.
 /// Mounts the div as a child of the HTML element with the defined ID.
 /// The specified dimensions restrict the area in which div are visible.
