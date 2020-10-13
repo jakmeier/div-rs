@@ -8,8 +8,8 @@ pub fn main() {
     // Create a new pane at offset (100,100) from body
     // with size 500px/500px and then create a single
     // text node inside it with an external class stored in TODO
-    const X: u32 = 100;
-    const Y: u32 = 100;
+    const X: u32 = 0;
+    const Y: u32 = 0;
     const W: u32 = 500;
     const H: u32 = 500;
     let class = div::JsClass::preregistered("MyComponent")

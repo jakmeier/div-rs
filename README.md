@@ -8,13 +8,22 @@ defined in JavaScript into the element.
 * Load Svelte or vanilla JS components dynamically from within Rust
 * Be a low-level building block for higher-level crates
 
-## Examples
-
-TODO
-
 ## What Div it NOT
 * A complete GUI library
 * A Virtual DOM implementation
+
+
+## Examples
+
+Have a look at the examples in example directory. The best way is to clone the repository and run it locally, so you can play around with the code.
+
+You need npm, webpack, and wasm-pack for the examples to run on your machine.
+```
+git clone https://github.com/jakmeier/div-rs.git
+cd div-rs/examples/www;
+npm run build;
+npm run start;
+```
 
 ## License
 [MIT / Apache-2.0](LICENSE.md)

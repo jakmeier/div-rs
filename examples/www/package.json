@@ -7,7 +7,7 @@
         "create-wasm-app": ".bin/create-wasm-app.js"
     },
     "scripts": {
-        "build": "webpack --config webpack.config.js",
+        "build": "wasm-pack build ../hello_svelte; wasm-pack build ../hello_world; wasm-pack build ../reposition/; wasm-pack build ../styled/; wasm-pack build ../toggle; webpack --config webpack.config.js",
         "start": "webpack-dev-server"
     },
     "repository": {
@@ -29,7 +29,9 @@
     "dependencies": {
         "hello_svelte": "file:../hello_svelte/pkg",
         "hello_world": "file:../hello_world/pkg",
-        "reposition": "file:../reposition/pkg/"
+        "reposition": "file:../reposition/pkg/",
+        "styled": "file:../styled/pkg/",
+        "toggle": "file:../toggle/pkg/"
     },
     "devDependencies": {
         "copy-webpack-plugin": "^5.0.0",

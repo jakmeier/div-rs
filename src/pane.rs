@@ -137,11 +137,7 @@ impl Pane {
     pub(crate) fn get_element(&self) -> Result<&HtmlElement, DivError> {
         Ok(&self.node)
     }
-    pub(crate) fn redraw(
-        &self,
-        (x, y): (u32, u32),
-        (fx, fy): (f32, f32),
-    ) -> Result<(), DivError> {
+    pub(crate) fn redraw(&self, (x, y): (u32, u32), (fx, fy): (f32, f32)) -> Result<(), DivError> {
         let x = x + (fx * self.x as f32) as u32;
         let y = y + (fy * self.y as f32) as u32;
         let w = (fx * self.w as f32) as u32;
