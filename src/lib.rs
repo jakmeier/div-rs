@@ -35,9 +35,9 @@ pub fn init_to(id: &str) -> Result<(), DivError> {
 /// The specified dimensions restrict the area in which div are visible.
 /// # Example
 /// ```
-/// let width = 1280
-/// let height = 720
-/// div::init_ex("div-root", 0, 0, width, height);
+/// let width = 1280;
+/// let height = 720;
+/// div::init_ex(Some("div-root"), (0, 0), Some((width, height)));
 /// ```
 pub fn init_ex(
     id: Option<&str>,
