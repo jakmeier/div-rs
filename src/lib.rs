@@ -15,10 +15,10 @@ pub use class::*;
 pub use error::*;
 pub use global::*;
 pub use pane_handle::*;
+pub use utils::doc;
 use state::*;
 use storage::{ClassStorage, PaneHashMap, PaneStorage};
 use style::*;
-use utils::doc;
 
 /// Mounts the div to the HTML body
 pub fn init() -> Result<(), DivError> {
