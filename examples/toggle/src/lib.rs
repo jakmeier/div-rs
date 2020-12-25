@@ -1,4 +1,4 @@
-use div::PaneHandle;
+use div::DivHandle;
 use stdweb::web::set_timeout;
 
 use wasm_bindgen::prelude::*;
@@ -22,15 +22,15 @@ pub fn main() {
         </div>
     </div>
     "#;
-    let pane0 = div::new_pane(100, 100, 100, 100, html0).unwrap();
-    let pane1 = div::new_pane(200, 200, 100, 100, html1).unwrap();
+    let div0 = div::new(100, 100, 100, 100, html0).unwrap();
+    let div1 = div::new(200, 200, 100, 100, html1).unwrap();
 
-    toggle(pane0, pane1);
+    toggle(div0, div1);
 }
 
 // Function that takes to div, shows the first and hides the second
 // and then calls itself again delayed, with the two div swapped
-fn toggle(a: PaneHandle, b: PaneHandle) {
+fn toggle(a: DivHandle, b: DivHandle) {
     a.show().expect("Error");
     b.hide().expect("Error");
     let closure = move || {

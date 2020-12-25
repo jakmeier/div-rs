@@ -2,12 +2,12 @@ use crate::pane::Pane;
 use crate::*;
 use std::collections::HashMap;
 
-/// A trait for data structures which store a div and assign unique PaneHandle to them
+/// A trait for data structures which store a div and assign unique DivHandle to them
 pub(crate) trait PaneStorage {
-    fn insert(&mut self, p: Pane) -> PaneHandle;
-    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, DivError>;
-    fn get(&self, p: &PaneHandle) -> Result<&Pane, DivError>;
-    fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, DivError>;
+    fn insert(&mut self, p: Pane) -> DivHandle;
+    fn remove(&mut self, p: &DivHandle) -> Result<Pane, DivError>;
+    fn get(&self, p: &DivHandle) -> Result<&Pane, DivError>;
+    fn get_mut(&mut self, p: &DivHandle) -> Result<&mut Pane, DivError>;
     fn for_each<F>(&mut self, f: &F) -> Result<(), DivError>
     where
         F: Fn(&mut Pane) -> Result<(), DivError>;
@@ -25,22 +25,22 @@ pub(crate) struct PaneHashMap {
 }
 
 impl PaneStorage for PaneHashMap {
-    fn insert(&mut self, p: Pane) -> PaneHandle {
+    fn insert(&mut self, p: Pane) -> DivHandle {
         let i = self.next_id();
         self.data.insert(i, p);
-        PaneHandle(i)
+        DivHandle(i)
     }
-    fn remove(&mut self, p: &PaneHandle) -> Result<Pane, DivError> {
+    fn remove(&mut self, p: &DivHandle) -> Result<Pane, DivError> {
         self.data
             .remove(&p.0)
             .ok_or_else(|| index_error(&p, self.next_idx))
     }
-    fn get(&self, p: &PaneHandle) -> Result<&Pane, DivError> {
+    fn get(&self, p: &DivHandle) -> Result<&Pane, DivError> {
         self.data
             .get(&p.0)
             .ok_or_else(|| index_error(p, self.next_idx))
     }
-    fn get_mut(&mut self, p: &PaneHandle) -> Result<&mut Pane, DivError> {
+    fn get_mut(&mut self, p: &DivHandle) -> Result<&mut Pane, DivError> {
         let idx = self.next_idx;
         self.data.get_mut(&p.0).ok_or_else(|| index_error(p, idx))
     }
@@ -63,7 +63,7 @@ impl PaneHashMap {
     }
 }
 
-fn index_error(p: &PaneHandle, max_idx: usize) -> DivError {
+fn index_error(p: &DivHandle, max_idx: usize) -> DivError {
     if max_idx > p.0 {
         DivError::UseAfterDelete
     } else {

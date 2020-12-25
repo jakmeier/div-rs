@@ -2,7 +2,7 @@ use crate::{error::*, utils::doc};
 
 pub(crate) fn add_div_styles_to_document() -> Result<(), DivError> {
     let css = r#"
-    .pane {
+    .div-rs {
         position: absolute;
         display: unset;
         z-index: 1;

@@ -31,7 +31,7 @@ pub fn main() {
     let html0 = "Pane 0<br>Styled with classes";
     let classes = ["white-on-black"];
     let css: [(&str, &str); 0] = [];
-    let _pane0 = div::new_styled_pane(100, 100, 200, 100, html0, &classes, &css).unwrap();
+    let _pane0 = div::new_styled(100, 100, 200, 100, html0, &classes, &css).unwrap();
 
     // Pane 1 with inline styles on pane
     let html1 = "Pane 1<br>Stlyed with classes and inline CSS";
@@ -41,7 +41,7 @@ pub fn main() {
         ("text-decoration", "underline"),
         ("padding", "5px"),
     ];
-    let _pane1 = div::new_styled_pane(125, 300, 200, 100, html1, &classes, &css).unwrap();
+    let _pane1 = div::new_styled(125, 300, 200, 100, html1, &classes, &css).unwrap();
 }
 
 // Small helper function, only for the example. Uses stdweb, DIV-RS does not really help you with this part of CSS.

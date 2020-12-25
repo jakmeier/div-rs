@@ -3,7 +3,12 @@ use crate::*;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlElement;
 
-/// Internal representation of a Pane
+/// Internal representation of the state required to control a div in the browser.
+///
+/// The first name for the crate was pane and a PaneHandle was exposed to library users.
+/// But a crate names pane already existed on crates.io and I decided div is a better name.
+/// As a consequence, all API exposed functions should only refer to divs.
+/// Internally, however, the name pane is still used.
 #[derive(Debug)]
 pub(crate) struct Pane {
     node: HtmlElement,
@@ -25,7 +30,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         html: &str,
         classes: &str,
         css: &str,
-    ) -> Result<PaneHandle, DivError> {
+    ) -> Result<DivHandle, DivError> {
         let window = web_sys::window().ok_or(DivError::MissingWindow)?;
         let doc = window.document().ok_or(DivError::MissingDocument)?;
 
@@ -36,7 +41,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
             .create_element("div")?
             .dyn_into()
             .map_err(|_| DivError::JsCastError)?;
-        node.set_class_name(&("pane ".to_owned() + classes));
+        node.set_class_name(&("div-rs".to_owned() + classes));
         node.set_inner_html(html);
         node.set_attribute("style", css)?;
 
@@ -54,7 +59,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         let ph = self.nodes.insert(vnode);
         Ok(ph)
     }
-    pub(crate) fn hide_pane(&mut self, p: &PaneHandle) -> Result<(), DivError> {
+    pub(crate) fn hide_pane(&mut self, p: &DivHandle) -> Result<(), DivError> {
         let v = &self.nodes.get_mut(p)?;
         if v.displayed {
             let old_node = self
@@ -67,7 +72,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         }
         Ok(())
     }
-    pub(crate) fn show_pane(&mut self, p: &PaneHandle) -> Result<(), DivError> {
+    pub(crate) fn show_pane(&mut self, p: &DivHandle) -> Result<(), DivError> {
         let mut v = self.nodes.get_mut(&p)?;
         if !v.displayed {
             self.root.append_child(&v.node)?;
@@ -75,21 +80,21 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         }
         Ok(())
     }
-    pub(crate) fn delete_pane(&mut self, p: &PaneHandle) -> Result<(), DivError> {
+    pub(crate) fn delete_pane(&mut self, p: &DivHandle) -> Result<(), DivError> {
         // This removes the node from the DOM
         self.hide_pane(p)?;
         // This deletes all references for GC
         self.nodes.remove(p)?;
         Ok(())
     }
-    pub(crate) fn get_node(&self, p: &PaneHandle) -> Result<&HtmlElement, DivError> {
+    pub(crate) fn get_node(&self, p: &DivHandle) -> Result<&HtmlElement, DivError> {
         let v = self.nodes.get(&p)?;
         Ok(&v.node)
     }
     #[inline(always)]
     pub(crate) fn update_pane(
         &mut self,
-        pane_handle: &PaneHandle,
+        pane_handle: &DivHandle,
         x: Option<u32>,
         y: Option<u32>,
         w: Option<u32>,
@@ -103,7 +108,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         v.redraw(self.pos, self.zoom)?;
         Ok(())
     }
-    pub(crate) fn reposition_div(&mut self, x: u32, y: u32) -> Result<(), DivError> {
+    pub(crate) fn global_reposition(&mut self, x: u32, y: u32) -> Result<(), DivError> {
         self.pos = (x, y);
         self.nodes.for_each(&|pane: &mut Pane| {
             let el = pane.get_element()?;
@@ -119,7 +124,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
             Ok(())
         })
     }
-    pub(crate) fn resize_div(&mut self, w: u32, h: u32) -> Result<(), DivError> {
+    pub(crate) fn global_resize(&mut self, w: u32, h: u32) -> Result<(), DivError> {
         if let Some((width, height)) = self.size {
             let fx = w as f32 / width as f32;
             let fy = h as f32 / height as f32;

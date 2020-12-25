@@ -31,32 +31,32 @@ examples.push(example(
     "let w = 500;\n" +
     "let h = 500;\n" +
     "let html = \"Hello world\";\n" +
-    "div::new_pane(x, y, w, h, html);",
+    "div::new(x, y, w, h, html);",
     () => {
         hello_world.main();
     }));
 examples.push(example(
     "Reposition",
-    "Use arrow keys to move all panes and +,- to change scaling factor.\n\n" +
+    "Use arrow keys to move all divs and +,- to change scaling factor.\n\n" +
     "div::reposition(x, y)\n" +
     "div::resize(w, h)\n\n" +
-    " Use W,A,S,D to move only one pane and 1,2 for scaling.\n\n" +
-    "pane_a.reposition(x,y)\n" +
-    "pane_a.resize(w,h)\n" +
+    " Use W,A,S,D to move only one div and 1,2 for scaling.\n\n" +
+    "div_a.reposition(x,y)\n" +
+    "div_a.resize(w,h)\n" +
     "\n\nThis is meant to be used as hovering test over a canvas that needs to be rescaled when the window size changes.",
     () => {
         reposition.main();
     }));
 examples.push(example(
     "Styled",
-    "These panes are dynamically styled from within Rust, using CSS.",
+    "These divs are dynamically styled from within Rust, using CSS.",
     () => {
         styled.main();
     }));
 examples.push(example(
     "Toggle",
     "hi.show()\nbye.hide()\n\n" +
-    "Two panes are periodically displayed and hidden, as controlled by Rust code.",
+    "Two divs are periodically displayed and hidden, as controlled by Rust code.",
     () => {
         toggle.main();
     }));

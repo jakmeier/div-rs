@@ -2,23 +2,23 @@ use std::{future::Future, sync::RwLock};
 use web_sys::Element;
 
 mod class;
+pub mod div_handle;
 pub mod error;
 pub mod global;
 mod pane;
-pub mod pane_handle;
 mod state;
 mod storage;
 mod style;
 mod utils;
 
 pub use class::*;
+pub use div_handle::*;
 pub use error::*;
 pub use global::*;
-pub use pane_handle::*;
-pub use utils::doc;
 use state::*;
 use storage::{ClassStorage, PaneHashMap, PaneStorage};
 use style::*;
+pub use utils::doc;
 
 /// Mounts the div to the HTML body
 pub fn init() -> Result<(), DivError> {
@@ -31,8 +31,8 @@ pub fn init_to(id: &str) -> Result<(), DivError> {
 }
 
 /// Extended initialization function.
-/// Mounts the div as a child of the HTML element with the defined ID.
-/// The specified dimensions restrict the area in which div are visible.
+/// Mounts a global div as a child of the HTML element with the defined ID.
+/// The specified dimensions restrict the area in which divs are visible.
 /// # Example
 /// ```
 /// let width = 1280;
@@ -69,18 +69,18 @@ fn get_root(id: Option<&str>) -> Result<Element, DivError> {
     Ok(element)
 }
 
-/// Creates a new pane at the defined position with the given HTML as content.
-/// Use the returned PaneHandle to manipulate the pane.
-pub fn new_pane(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle, DivError> {
+/// Creates a new div at the defined position with the given HTML as content.
+/// Use the returned DivHandle to manipulate the div.
+pub fn new(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<DivHandle, DivError> {
     let css = "";
     let classes = "";
     state::exec_mut(|state| state.new_pane(x, y, w, h, html, css, classes))
 }
 
-/// Creates a new pane at the defined position with the given HTML as content and with CSS classes and inline styles.
+/// Creates a new div at the defined position with the given HTML as content and with CSS classes and inline styles.
 ///
 /// Traditionally on the web, classes in combination with a style-sheet are the best way to apply CSS to HTML.
-/// But sometimes, it can also be useful to add styles right on the top HTML element of a pane.
+/// But sometimes, it can also be useful to add styles right on the top HTML element of a div.
 /// With this function, both options are open and can even be combined.
 ///
 /// This function has several generic parameters to maximize flexibility and allow for all combinations of &str and String.
@@ -91,14 +91,14 @@ pub fn new_pane(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<PaneHandle
 /// let html = "Some text";
 /// let classes = ["my-class"];
 /// let css: [(&str, &str);0] = [];
-/// let pane = div::new_styled_pane(
+/// let div = div::new_styled(
 ///     0,0,1000,1000,
 ///     html,
 ///     &classes,
 ///     &css,
 /// ).unwrap();
 /// ```
-pub fn new_styled_pane<'a, C, CSS, S1, S2, S3>(
+pub fn new_styled<'a, C, CSS, S1, S2, S3>(
     x: u32,
     y: u32,
     w: u32,
@@ -106,7 +106,7 @@ pub fn new_styled_pane<'a, C, CSS, S1, S2, S3>(
     html: &str,
     classes: C,
     css: CSS,
-) -> Result<PaneHandle, DivError>
+) -> Result<DivHandle, DivError>
 where
     C: IntoIterator<Item = &'a S1>,
     CSS: IntoIterator<Item = &'a (S2, S3)>,
@@ -166,15 +166,15 @@ pub fn load_js_classes(
     Ok(future)
 }
 
-/// Creates a new pane and fills it with a JS class.
+/// Creates a new div and fills it with a JS class.
 pub fn from_js_class(
     x: u32,
     y: u32,
     w: u32,
     h: u32,
     class_handle: JsClassHandle,
-) -> Result<PaneHandle, DivError> {
-    let ph = new_pane(x, y, w, h, "")?;
+) -> Result<DivHandle, DivError> {
+    let ph = new(x, y, w, h, "")?;
     let node = ph.parent_element()?;
     let class = state::get_class(class_handle)?;
     class.attach_new_instance(&node);

@@ -13,5 +13,5 @@ pub fn main() {
     let w = 500;
     let h = 500;
     let html = "Hello world";
-    div::new_pane(x, y, w, h, html);
+    div::new(x, y, w, h, html);
 }

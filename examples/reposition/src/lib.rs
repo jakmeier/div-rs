@@ -34,7 +34,7 @@ pub fn main() {
     let html0 = r#"
     <div style="border:solid; width: 100%; height: 100%; box-sizing: border-box; border: 5px solid black;"></div>
     "#;
-    div::new_pane(0, 0, w, h, html0).unwrap();
+    div::new(0, 0, w, h, html0).unwrap();
 
     // Create two div within to show internal scaling behavior
     let html1 = r#"
@@ -49,8 +49,8 @@ pub fn main() {
     "#;
     // pane A will have a dynamic position and size
     let (mut ax, mut ay, aw, ah) = (50, 50, 100, 100);
-    let pane_a = div::new_pane(ax, ay, aw, ah, html1).unwrap();
-    let _pane_b = div::new_pane(200, 50, 100, 100, html2).unwrap();
+    let pane_a = div::new(ax, ay, aw, ah, html1).unwrap();
+    let _pane_b = div::new(200, 50, 100, 100, html2).unwrap();
 
     // Define control variables for zoom of global area and pane A
     let mut f = 1.0;
