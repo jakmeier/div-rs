@@ -46,6 +46,18 @@ impl PaneHandle {
     pub fn reposition_and_resize(&self, x: u32, y: u32, w: u32, h: u32) -> Result<(), DivError> {
         state::exec_mut(|state| state.update_pane(&self, Some(x), Some(y), Some(w), Some(h)))
     }
+    /// Set CSS property of div
+    pub fn set_css(&mut self, property: &str, value: &str) -> Result<(), DivError> {
+        state::exec(|state| state.nodes.get(self)?.set_css(property, value))
+    }
+    /// Add a CSS class to the div
+    pub fn add_class(&mut self, css_class: &str) -> Result<(), DivError> {
+        state::exec(|state| state.nodes.get(self)?.add_class(css_class))
+    }
+    /// Remove a CSS class to the div
+    pub fn remove_class(&mut self, css_class: &str) -> Result<(), DivError> {
+        state::exec(|state| state.nodes.get(self)?.remove_class(css_class))
+    }
     /// Removes a pane from the DOM and deletes it
     pub fn delete(&mut self) -> Result<(), DivError> {
         state::exec_mut(|state| state.delete_pane(self))

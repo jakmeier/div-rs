@@ -14,16 +14,16 @@ description = "Crate to ease web-programming including Rust as fist-class citize
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wasm-bindgen = "0.2.68"
+wasm-bindgen = "0.2"
 
 [dependencies.web-sys]
 version = "0.3"
 features = [
     "console",
     "CssStyleDeclaration",
+    "DomTokenList",
     "Document",
     "Element",
-    "HtmlCollection",
     "HtmlElement",
     "HtmlHeadElement",
     "HtmlScriptElement",
@@ -32,4 +32,4 @@ features = [
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
-wasm-bindgen-futures = "0.4.18"
+wasm-bindgen-futures = "0.4"

@@ -151,4 +151,16 @@ impl Pane {
 
         Ok(())
     }
+    pub(crate) fn set_css(&self, property: &str, value: &str) -> Result<(), DivError> {
+        self.node.style().set_property(property, value)?;
+        Ok(())
+    }
+    pub(crate) fn add_class(&self, css_class: &str) -> Result<(), DivError> {
+        self.node.class_list().add_1(css_class)?;
+        Ok(())
+    }
+    pub(crate) fn remove_class(&self, css_class: &str) -> Result<(), DivError> {
+        self.node.class_list().remove_1(css_class)?;
+        Ok(())
+    }
 }
