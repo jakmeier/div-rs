@@ -31,6 +31,34 @@ pub fn init_to(id: &str) -> Result<(), DivError> {
 }
 
 /// Extended initialization function.
+/// Mounts a global div as a child of the element provided.
+/// The specified dimensions restrict the area in which divs are visible.
+/// # Example
+/// ```
+/// let width = 1280;
+/// let height = 720;
+/// let root = web_sys::window().unwrap().document().unwrap().get_element_by_id("my-root-id").unwrap();
+/// div::init_ex_with_element(root, (0, 0), Some((width, height)));
+/// ```
+pub fn init_ex_with_element(
+    root: Element,
+    pos: (u32, u32),
+    size: Option<(u32, u32)>,
+) -> Result<(), DivError> {
+    state::set_state(GlobalState {
+        root,
+        nodes: PaneHashMap::default(),
+        pos,
+        size,
+        zoom: (1.0, 1.0),
+        classes: JsClassStorage::default(),
+    })?;
+    add_div_styles_to_document()?;
+    init_div_rs();
+    Ok(())
+}
+
+/// Extended initialization function.
 /// Mounts a global div as a child of the HTML element with the defined ID.
 /// The specified dimensions restrict the area in which divs are visible.
 /// # Example
@@ -45,17 +73,7 @@ pub fn init_ex(
     size: Option<(u32, u32)>,
 ) -> Result<(), DivError> {
     let root = get_root(id)?;
-    state::set_state(GlobalState {
-        root,
-        nodes: PaneHashMap::default(),
-        pos,
-        size,
-        zoom: (1.0, 1.0),
-        classes: JsClassStorage::default(),
-    })?;
-    add_div_styles_to_document()?;
-    init_div_rs();
-    Ok(())
+    init_ex_with_element(root, pos, size)
 }
 
 fn get_root(id: Option<&str>) -> Result<Element, DivError> {
