@@ -1,6 +1,6 @@
 [package]
 name = "div"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Jakob Meier <inbox@jakobmeier.ch>"]
 edition = "2018"
 license = "MIT/Apache-2.0"
@@ -8,7 +8,7 @@ categories = ["wasm", "web-programming", "gui"]
 keywords = ["html", "pane", "splitview", "web", "svelte"]
 readme = "README.md"
 repository = "https://github.com/jakmeier/div-rs"
-description = "Crate to ease web-programming including Rust as fist-class citizen."
+description = "Ad hoc HTML for Rust Web Apps."
 
 [lib]
 crate-type = ["cdylib", "rlib"]
