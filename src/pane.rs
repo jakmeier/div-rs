@@ -13,8 +13,8 @@ use web_sys::HtmlElement;
 pub(crate) struct Pane {
     node: HtmlElement,
     displayed: bool,
-    x: u32,
-    y: u32,
+    x: i32,
+    y: i32,
     w: u32,
     h: u32,
 }
@@ -23,8 +23,8 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
     /// Creates a new pane from specified html and shows it
     pub(crate) fn new_pane(
         &mut self,
-        x: u32,
-        y: u32,
+        x: i32,
+        y: i32,
         w: u32,
         h: u32,
         html: &str,
@@ -95,8 +95,8 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
     pub(crate) fn update_pane(
         &mut self,
         pane_handle: &DivHandle,
-        x: Option<u32>,
-        y: Option<u32>,
+        x: Option<i32>,
+        y: Option<i32>,
         w: Option<u32>,
         h: Option<u32>,
     ) -> Result<(), DivError> {
@@ -108,7 +108,7 @@ impl<PS: PaneStorage, CS: ClassStorage> GlobalState<PS, CS> {
         v.redraw(self.pos, self.zoom)?;
         Ok(())
     }
-    pub(crate) fn global_reposition(&mut self, x: u32, y: u32) -> Result<(), DivError> {
+    pub(crate) fn global_reposition(&mut self, x: i32, y: i32) -> Result<(), DivError> {
         self.pos = (x, y);
         self.nodes.for_each(&|pane: &mut Pane| {
             let el = pane.get_element()?;
@@ -142,9 +142,9 @@ impl Pane {
     pub(crate) fn get_element(&self) -> Result<&HtmlElement, DivError> {
         Ok(&self.node)
     }
-    pub(crate) fn redraw(&self, (x, y): (u32, u32), (fx, fy): (f32, f32)) -> Result<(), DivError> {
-        let x = x + (fx * self.x as f32) as u32;
-        let y = y + (fy * self.y as f32) as u32;
+    pub(crate) fn redraw(&self, (x, y): (i32, i32), (fx, fy): (f32, f32)) -> Result<(), DivError> {
+        let x = x + (fx * self.x as f32) as i32;
+        let y = y + (fy * self.y as f32) as i32;
         let w = (fx * self.w as f32) as u32;
         let h = (fy * self.h as f32) as u32;
 

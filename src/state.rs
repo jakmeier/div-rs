@@ -5,7 +5,7 @@ where
     CS: ClassStorage,
 {
     pub(crate) root: web_sys::Element,
-    pub(crate) pos: (u32, u32),
+    pub(crate) pos: (i32, i32),
     pub(crate) size: Option<(u32, u32)>,
     pub(crate) zoom: (f32, f32),
     pub(crate) nodes: PS,

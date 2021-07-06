@@ -28,7 +28,7 @@ impl DivHandle {
     ///
     /// The provided parameters are taken in the original scale when initializing,
     /// taking any calls to the global div::resize() into consideration.
-    pub fn reposition(&self, x: u32, y: u32) -> Result<(), DivError> {
+    pub fn reposition(&self, x: i32, y: i32) -> Result<(), DivError> {
         state::exec_mut(|state| state.update_pane(&self, Some(x), Some(y), None, None))
     }
     /// Adjust the size of the div.
@@ -43,7 +43,7 @@ impl DivHandle {
     ///
     /// The provided parameters are taken in the original scale when initializing,
     /// taking any calls to the global div::resize() into consideration.
-    pub fn reposition_and_resize(&self, x: u32, y: u32, w: u32, h: u32) -> Result<(), DivError> {
+    pub fn reposition_and_resize(&self, x: i32, y: i32, w: u32, h: u32) -> Result<(), DivError> {
         state::exec_mut(|state| state.update_pane(&self, Some(x), Some(y), Some(w), Some(h)))
     }
     /// Set CSS property of div

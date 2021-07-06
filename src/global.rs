@@ -4,7 +4,7 @@ use super::*;
 ///
 /// The position of all existing div is changed immediately, regardless of active / inactive status.
 /// if div::init() has been used instead of div::init_ex(...), the default origin is (0,0).
-pub fn reposition(x: u32, y: u32) -> Result<(), DivError> {
+pub fn reposition(x: i32, y: i32) -> Result<(), DivError> {
     state::exec_mut(|state| state.global_reposition(x, y))
 }
 

@@ -42,7 +42,7 @@ pub fn init_to(id: &str) -> Result<(), DivError> {
 /// ```
 pub fn init_ex_with_element(
     root: Element,
-    pos: (u32, u32),
+    pos: (i32, i32),
     size: Option<(u32, u32)>,
 ) -> Result<(), DivError> {
     state::set_state(GlobalState {
@@ -69,7 +69,7 @@ pub fn init_ex_with_element(
 /// ```
 pub fn init_ex(
     id: Option<&str>,
-    pos: (u32, u32),
+    pos: (i32, i32),
     size: Option<(u32, u32)>,
 ) -> Result<(), DivError> {
     let root = get_root(id)?;
@@ -89,7 +89,7 @@ fn get_root(id: Option<&str>) -> Result<Element, DivError> {
 
 /// Creates a new div at the defined position with the given HTML as content.
 /// Use the returned DivHandle to manipulate the div.
-pub fn new(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<DivHandle, DivError> {
+pub fn new(x: i32, y: i32, w: u32, h: u32, html: &str) -> Result<DivHandle, DivError> {
     let css = "";
     let classes = "";
     state::exec_mut(|state| state.new_pane(x, y, w, h, html, css, classes))
@@ -117,8 +117,8 @@ pub fn new(x: u32, y: u32, w: u32, h: u32, html: &str) -> Result<DivHandle, DivE
 /// ).unwrap();
 /// ```
 pub fn new_styled<'a, C, CSS, S1, S2, S3>(
-    x: u32,
-    y: u32,
+    x: i32,
+    y: i32,
     w: u32,
     h: u32,
     html: &str,
@@ -155,8 +155,8 @@ where
 /// The most direct way would be to use `wasm_bindgen_futures::spawn_local`
 /// ## Example
 /// ```rust
-/// const X: u32 = 100;
-/// const Y: u32 = 100;
+/// const X: i32 = 100;
+/// const Y: i32 = 100;
 /// const W: u32 = 500;
 /// const H: u32 = 500;
 /// let future = async {
@@ -186,8 +186,8 @@ pub fn load_js_classes(
 
 /// Creates a new div and fills it with a JS class.
 pub fn from_js_class(
-    x: u32,
-    y: u32,
+    x: i32,
+    y: i32,
     w: u32,
     h: u32,
     class_handle: JsClassHandle,
